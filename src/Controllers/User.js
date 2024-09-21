@@ -1,87 +1,96 @@
+const User = require('../Model/User');
 const ErrorHandling = require('../../utils/Errorhandling');
 const catchAsyncError = require('../../middleware/catchAsyncError');
-const User = require('../Model/User');
-const sendToken = require('../../utils/SendToken');
-const cloudinary = require('cloudinary');
-const twilio = require('twilio');
 const generateOTP = require('../../utils/Otp');
-
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioClient = twilio(accountSid, authToken);
+const {snsClient, PublishCommand} = require('../../utils/AWS/SNS');
+const sendToken=require('../../utils/SendToken');
 
 
-//Register a User
-const getOTP = catchAsyncError(async (req, res, next) => {
-    const d = new Date();
-    const phoneNumber = req.body.phoneNumber;
-    const randomNumber = generateOTP();
+const sendOtp = catchAsyncError(async (req, res, next) => {
+    const { mobile } = req.body;
 
-    const user = await User.findOne({ phoneNumber: phoneNumber });
-
-    if (!user) {
-       return next(new ErrorHandling(400, "user not found"));
-    } else {
-        const message = `Hello from Fit4Sure! Your verification code is: ${randomNumber}`;
-
-        const response = await twilioClient.messages.create({
-            from: process.env.TWILIO_PHONE_NUMBER,
-            to: "+91" + phoneNumber,
-            body: message,
-        });
-
-        user.otp = {
-            value: randomNumber,
-            createdAt: d.getTime()
-        }
-        await user.save();
+    if (!mobile) {
+        return next(new ErrorHandling(400, "mobile number is required"));
     }
 
-    res.status(200).send({
-        success: true
+    const otp = generateOTP();
+
+    let user = await User.findOne({ mobile });
+
+    // If user doesn't exist, create a new one
+    if (!user) {
+        user = new User({ mobile, otp, otpCreatedAt: new Date() });
+    } else {
+        user.otp = otp;
+        user.otpCreatedAt = new Date();
+    }
+
+    await user.save();
+
+
+    const params = {
+        Message: `Your VisaFu verification OTP is: ${otp}. This code will expire in 1 minute`,
+        PhoneNumber: `+${mobile}`,
+        MessageAttributes: {
+            'AWS.SNS.SMS.SMSType': {
+                DataType: 'String',
+                StringValue: 'Transactional'
+            }
+        }
+    };
+
+
+    const command = new PublishCommand(params);
+
+    snsClient.send(command)
+    .then((result) => {
+        return res.status(200).send({
+            message: 'OTP send successfully'
+        })
+    })
+    .catch((error) => {
+        return res.status(200).send({
+            message: 'Error Sending OTP'
+        })
     });
+
 });
 
-//Otp Verification
-const otpVerification = catchAsyncError(async (req, res, next) => {
-    const { phoneNumber, otp } = req.body;
-    const d = new Date();
 
-    const user = await User.findOne({ phoneNumber: phoneNumber });
+
+// check OTP validity
+const isOtpExpired = (otpCreatedAt) => {
+    const now = new Date();
+    const diff = (now - otpCreatedAt) / 1000; // Difference in seconds
+    return diff > 75; // 1 min 15 seconds = 75 seconds
+};
+
+
+const verifyOtp = catchAsyncError(async (req, res, next) => {
+    const { mobile, otp } = req.body;
+
+    if (!mobile || !otp) {
+        return next(new ErrorHandling(400, "mobile number or otp is required"));
+    }
+
+
+    const user = await User.findOne({ mobile });
 
     if (!user) {
         return next(new ErrorHandling(400, "user not found"));
     }
-    if (user.otp.value === otp && ((d.getTime() - user.otp.createdAt) / (1000 * 60 * 60 * 24)) < 1) {
-        user.otp.createdAt = user.otp.createdAt - 1000 * 60 * 60 * 24;
-        await user.save();
-        sendToken(user, res, 200);
-    } else {
-        return res.status(400).json({ message: `The phone number and the OTP code doesn't match or OTP has expired.` });
+
+    if (isOtpExpired(user.otpCreatedAt)) {
+        return next(new ErrorHandling(400, "otp is expired"));;
     }
+
+    if (user.otp !== otp) {
+        return next(new ErrorHandling(400, "invalid otp"));;
+    }
+
+    sendToken(user,res,200);
 })
 
 
-//logged Out
-const logOut = catchAsyncError((req, res, next) => {
-    res.cookie("token", null, {
-        httpOnly: true,
-        expires: new Date(Date.now())
-    })
-    res.json({
-        success: true,
-        message: "Successfully logged Out"
-    })
-})
 
-//Get Profile
-const getProfile = catchAsyncError(async (req, res, next) => {
-    const user = await User.findById(req.user.id);
-    res.status(200).json({
-        success: true,
-    })
-});
-
-
-
-module.exports = { getOTP, logOut, getProfile, otpVerification };
+module.exports = { verifyOtp, sendOtp };

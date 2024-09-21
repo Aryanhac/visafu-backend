@@ -1,7 +1,8 @@
 const http=require('http');
 const app=require('./src/app');
 const database=require('./config/database');
-const cloudinary = require('cloudinary');
+
+
 //uncaughtException Error
 process.on('uncaughtException',(err)=>{
     console.log(`Error:${err}`);
@@ -10,17 +11,7 @@ process.on('uncaughtException',(err)=>{
         process.exit();
     })
 })
-//Config
-// if(process.env.NODE_ENV!=='Production'){
-    // require('dotenv').config({path:'../config/config.env'});
-// }
 
-//connecting to cloudinary
-cloudinary.config({
-  cloud_name:process.env.CLOUD_NAME,
-  api_key:process.env.CLOUD_API_KEY,
-  api_secret:process.env.CLOUD_API_SECRET
-})
 const server=http.createServer(app);
 
 //connecting to database
