@@ -1,9 +1,20 @@
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
 
-const photoSchema = new Schema({
-    url: { type: String, required: true }, // URL or file path of the photo
-    uploadedAt: { type: Date, default: Date.now }
+const photoSchema = new mongoose.Schema({
+  image: {
+    type: String, 
+    required: true
+  },
+  verified: {
+    type: Boolean, 
+    default: false 
+  },
+  uploadDate: {
+    type: Date, 
+    default: Date.now 
+  }
 });
 
-module.exports = mongoose.model('Photo', photoSchema);
+const Photo = mongoose.model('Photo', photoSchema);
+
+module.exports = Photo;
