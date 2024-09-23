@@ -7,7 +7,7 @@ const generateOTP = require('../../utils/Otp');
 const { snsClient, PublishCommand } = require('../../utils/AWS/SNS');
 const sendToken = require('../../utils/SendToken');
 // const SendMail = require('../../utils/SendMail');
-const upload = require('../../utils/uploadImage');
+const uploadFiletoS3 = require('../../utils/uploadFile');
 
 
 
@@ -121,8 +121,11 @@ const logOut = catchAsyncError(async (req, res, next) => {
 //     SendMail(options, res);
 // })
 
+
+// for updating profile
 const updateProfile = catchAsyncError(async (req, res, next) => {
-    const { email, passportDetails } = req.body;
+    const { email } = req.body;
+    const passportDetails = JSON.parse(req.body.passportDetails);
 
     const user = req.user;
 
@@ -130,24 +133,20 @@ const updateProfile = catchAsyncError(async (req, res, next) => {
         user.email = email;
     }
 
-    // Step 4: Handle passport update (optional)
     let passportId = user.passportId;
-    if (passportDetails && (req.files['passportFront'] || req.files['passportBack'])) {
-        // If passport details or images are provided, update/create the passport record
 
-        // Step 4.1: Upload passport front and back images if provided
+    if (passportDetails && req.files && (req.files['passportFront'] || req.files['passportBack'])) {
+
         let frontImageUrl, backImageUrl;
         if (req.files['passportFront']) {
-            frontImageUrl = await upload.single(req.files['passportFront'][0]);
+            frontImageUrl = await uploadFiletoS3(req.files['passportFront']);
         }
         if (req.files['passportBack']) {
-            backImageUrl = await upload.single(req.files['passportBack'][0]);
+            backImageUrl = await uploadFiletoS3(req.files['passportBack']);
         }
 
-        // Step 4.2: Check if passport already exists or create a new one
         let passport = passportId ? await Passport.findById(passportId) : new Passport();
 
-        // Step 4.3: Update passport images and details (if provided)
         if (frontImageUrl) passport.frontImage = frontImageUrl;
         if (backImageUrl) passport.backImage = backImageUrl;
 
@@ -165,16 +164,13 @@ const updateProfile = catchAsyncError(async (req, res, next) => {
             };
         }
 
-        // Step 4.4: Save passport and set the passportId for user
         await passport.save();
         passportId = passport._id;
     }
 
-    // Step 5: Handle photo update (optional)
     let photoId = user.photoId;
-    if (req.files['photo']) {
-        // Step 5.1: Upload photo and create/update photo record
-        const photoImageUrl = await uploadToS3(req.files['photo'][0]);
+    if (req.files && req.files['photo']) {
+        const photoImageUrl = await uploadFiletoS3(req.files['photo']);
 
         let photo = photoId ? await Photo.findById(photoId) : new Photo();
         photo.image = photoImageUrl;
@@ -183,7 +179,6 @@ const updateProfile = catchAsyncError(async (req, res, next) => {
         photoId = photo._id;
     }
 
-    // Step 6: Update the user's passportId and photoId if needed
     if (passportId) {
         user.passportId = passportId;
     }
@@ -191,15 +186,40 @@ const updateProfile = catchAsyncError(async (req, res, next) => {
         user.photoId = photoId;
     }
 
-    // Step 7: Save the updated user
     await user.save();
 
-    // Respond with the updated user details
     res.status(200).json({
         message: 'Profile updated successfully',
         user
     });
 })
 
+//getProfile
+const getProfile = catchAsyncError(async (req, res, next) => {
+    const userId = req.user._id;
+    const user = await User.findById(userId).populate('photoId passportId visaAppliedIds');
+    res.status(200).send({
+        user
+    })
+})
 
-module.exports = { verifyOtp, sendOtp, logOut, updateProfile };
+//getUserProfile
+const getUser = catchAsyncError(async (req, res, next) => {
+    const userId = req.params.id;
+    const user = await User.findById(userId).populate('photoId passportId visaAppliedIds');
+    if (!user) {
+        return next(new ErrorHandling(404, "User not found"));
+    }
+    res.status(200).send({
+        user
+    });
+})
+
+const getUsers = catchAsyncError(async (req, res, next) => {
+    const users = await User.find().populate('photoId passportId visaAppliedIds');
+    res.status(200).send({
+        users
+    });
+})
+
+module.exports = { verifyOtp, sendOtp, logOut, updateProfile, getProfile, getUser, getUsers};

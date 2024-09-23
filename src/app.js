@@ -2,6 +2,7 @@ const express =require('express');
 const cookieParser=require('cookie-parser');
 const errorMiddleware =require('../middleware/error');
 const app=express();
+const fileupload = require('express-fileupload');
 var cors = require('cors')
 
 //Config
@@ -16,10 +17,10 @@ app.use(cors({
     origin: '*',
     credentials: true }));
     
-app.use(express.json({ limit: "50mb" }));
+app.use(fileupload());
+app.use(express.json({limit:"100kb"}));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-    
 
 //Router
 const user=require('../src/Router/User');
