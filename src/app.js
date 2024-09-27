@@ -24,22 +24,14 @@ app.use(cookieParser());
 
 //Router
 const user=require('../src/Router/User');
+const visa = require('../src/Router/Visa');
+const visaApplied = require('../src/Router/VisaApplied');
 
-app.use('/api',user);;
+app.use('/api',user);
+app.use('/api',visa);
+app.use('/api',visaApplied);
 
 
-
-
-
-// File upload route
-// const upload = require('../utils/uploadImage')
-// app.post('/upload', upload.single('image'), (req, res) => {
-//     res.send({
-//       message: 'Image uploaded successfully!',
-//       imageUrl: req.file.location, // S3 URL for the uploaded file
-//     });
-// });
-  
 //Error middleware
 app.use(errorMiddleware);
 module.exports=app;
