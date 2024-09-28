@@ -26,10 +26,12 @@ app.use(cookieParser());
 const user=require('../src/Router/User');
 const visa = require('../src/Router/Visa');
 const visaApplied = require('../src/Router/VisaApplied');
+const addOns = require('../src/Router/AddOns');
 
 app.use('/api',user);
 app.use('/api',visa);
 app.use('/api',visaApplied);
+app.use('/api', addOns);
 
 
 //Error middleware
