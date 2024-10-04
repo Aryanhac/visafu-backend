@@ -6,7 +6,6 @@ const catchAsyncError = require('../../middleware/catchAsyncError');
 const generateOTP = require('../../utils/Otp');
 const { snsClient, PublishCommand } = require('../../utils/AWS/SNS');
 const sendToken = require('../../utils/SendToken');
-// const SendMail = require('../../utils/SendMail');
 const uploadFiletoS3 = require('../../utils/uploadFile');
 
 
@@ -111,15 +110,6 @@ const logOut = catchAsyncError(async (req, res, next) => {
     })
 })
 
-// const sendEmail = catchAsyncError(async (req, res, next) => {
-//     let options = {
-//         to: "ag98974461@gmail.com",
-//         subject: "Visa Fu",
-//         message: "hi Aryan, I'm from visafu"
-//     }
-
-//     SendMail(options, res);
-// })
 
 
 // for updating profile

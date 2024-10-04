@@ -5,7 +5,7 @@ const visaAppliedSchema = new Schema({
     visaId: { type: Schema.Types.ObjectId, ref: 'Visa', required: true },
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
     createdBy: { type: Date, default: Date.now }, 
-    arrivedDate: { type: String, required: true }, 
+    departureDate: { type: String, required: true }, 
     numberOfTravellers: { type: Number, required: true }, 
     visaDetails: [{
         passportId: { type: Schema.Types.ObjectId, ref: 'Passport', required: true }, 

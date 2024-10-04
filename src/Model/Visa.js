@@ -3,10 +3,19 @@ const { Schema } = mongoose;
 
 const visaSchema = new Schema({
     countryName: { type: String, required: true },
-    price: { type: String, required: true },
-    visaFuCharges: { type: String, required: true },
+    price: { 
+        INR: { type: String, required: true },
+        USD: { type: String, required: true }
+    },
+    visaFuCharges: { 
+        INR: { type: String, required: true },
+        USD: { type: String, required: true }
+    },
     heading: { type: String, required: true },
-    tax: { type: String, required: true },
+    tax: { 
+        INR: { type: String, required: true },
+        USD: { type: String, required: true }
+    },
     visaImage: { type: String, required: true }, 
     faq: [{
         question: { type: String, required: true },
@@ -35,10 +44,11 @@ const visaSchema = new Schema({
     cardImage: { type: String, required: true }, 
     city: [{ type: String, required: true }], 
     visaType: { type: String, required: true },
-    percentageOff: {
+    percentageOff: [{
         numOfTravel: { type: Number, required: true },
         percentageOff: { type: Number, required: true }
-    }
+      }
+    ]
 });
 
 // Validation to ensure at least one FAQ and one review are provided

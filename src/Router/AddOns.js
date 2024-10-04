@@ -1,6 +1,6 @@
 const express = require('express');
-const { createAddOn, getAllAddOns, getAddOnById, updateAddOn, deleteAddOn } = require('./addOnController');
-const app = express.app();
+const { createAddOn, getAllAddOns, getAddOnById, updateAddOn, deleteAddOn } = require('../Controllers/AddOns');
+const app = express.Router();
 
 
 app.post('/addons', createAddOn); 

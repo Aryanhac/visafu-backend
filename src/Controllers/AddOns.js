@@ -4,12 +4,15 @@ const AddOn = require('../Model/AddOns');
 
 // Create a new AddOn
 const createAddOn = catchAsyncError(async (req, res, next) => {
-        const { name, price } = req.body;
+        const { name, description, price, tax, visaFuCharges } = req.body;
 
         // Create a new add-on
         const addOn = new AddOn({
             name,
-            price
+            description,
+            price,
+            visaFuCharges,
+            tax
         });
 
         // Save the add-on to the database
@@ -52,11 +55,11 @@ const getAddOnById = catchAsyncError(async (req, res, next) => {
 // Update an AddOn by ID
 const updateAddOn = catchAsyncError(async (req, res, next) => {
         const { id } = req.params;
-        const { name, price } = req.body;
+        const { name, price, description, visaFuCharges, tax } = req.body;
 
         const updatedAddOn = await AddOn.findByIdAndUpdate(
             id,
-            { name, price },
+            { name, price, description, visaFuCharges, tax},
             { new: true, runValidators: true }
         );
 

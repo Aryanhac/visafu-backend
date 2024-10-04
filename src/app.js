@@ -18,7 +18,7 @@ app.use(cors({
     credentials: true }));
     
 app.use(fileupload());
-app.use(express.json({limit:"100kb"}));
+app.use(express.json({limit:"1000kb"}));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
@@ -32,7 +32,6 @@ app.use('/api',user);
 app.use('/api',visa);
 app.use('/api',visaApplied);
 app.use('/api', addOns);
-
 
 //Error middleware
 app.use(errorMiddleware);

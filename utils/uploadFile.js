@@ -10,7 +10,8 @@ const uploadFiletoS3 = async (file) => {
     Bucket: process.env.BUCKET_NAME,
     Key: uniqueKey,
     Body: file.data,
-    ContentType: file.mimetype,
+    ContentType: file.mimeType,
+    ContentDisposition: 'inline'
   };
 
   const command = new PutObjectCommand(params);

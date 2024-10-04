@@ -3,6 +3,7 @@ const catchAsyncError = require('../../middleware/catchAsyncError');
 const uploadFiletoS3 = require('../../utils/uploadFile');
 const Passport = require('../Model/Passport');
 const Photo = require('../Model/Photo');
+const VisaApplied = require('../Model/VisaApplied');
 
 // upload documents 
 const uploadDocuments = async (documents) => {
@@ -64,7 +65,7 @@ const uploadDocuments = async (documents) => {
 const createVisaApplied = catchAsyncError(async (req, res, next) => {
     const {
         visaId,
-        arrivedDate,
+        departureDate,
         numberOfTravellers,
         documents,
         addOns,
@@ -78,7 +79,7 @@ const createVisaApplied = catchAsyncError(async (req, res, next) => {
     const newVisaApplied = new VisaApplied({
         visaId,
         userId,
-        arrivedDate,
+        departureDate,
         numberOfTravellers,
         visaDetails,
         addOns: addOns || [],
