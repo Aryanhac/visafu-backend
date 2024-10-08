@@ -8,7 +8,7 @@ const base64ToBuffer = require('../../utils/Base64ToBuffer');
 
 // createTestimonial API
 const createTestimonial = catchAsyncError(async (req, res, next) => {
-    console.log(req.body);
+    
     const { name, review, rating, image } = req.body;
 
     if (!image) {
@@ -16,7 +16,6 @@ const createTestimonial = catchAsyncError(async (req, res, next) => {
     }
 
     const buffer = base64ToBuffer(image);
-    console.log(buffer)
 
     const imageUrl = await uploadFiletoS3({...buffer, name: "reviewImage"});
 
