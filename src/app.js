@@ -27,11 +27,13 @@ const user=require('../src/Router/User');
 const visa = require('../src/Router/Visa');
 const visaApplied = require('../src/Router/VisaApplied');
 const addOns = require('../src/Router/AddOns');
+const testimonial = require('../src/Router/Testimonial');
 
 app.use('/api',user);
 app.use('/api',visa);
 app.use('/api',visaApplied);
 app.use('/api', addOns);
+app.use('/api',testimonial);
 
 //Error middleware
 app.use(errorMiddleware);
