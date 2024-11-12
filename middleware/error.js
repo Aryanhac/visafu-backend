@@ -6,7 +6,7 @@ module.exports=(err,req,res,next)=>{
     // when product id is too short 
     if(err.name === "CastError"){
         const message='Resource not found';
-        err=new ErrorHandling(400,message);
+        err=new ErrorHandling(404,message);
     }
     // when Register with duplicate email
     if(err.code===11000){
@@ -23,5 +23,6 @@ module.exports=(err,req,res,next)=>{
     res.status(err.statusCode).json({
         success:false,
         message:err.message,
+        status: err.statusCode
     })
 };

@@ -71,13 +71,13 @@ const getAllVisasCard = catchAsyncError(async (req, res, next) => {
 
 const getVisaById = catchAsyncError(async (req, res, next) => {
     const visa = await Visa.findById(req.params.id);
-    if (!visa) return next(new ErrorHandling(400, "Visa not found"));
+    if (!visa) return next(new ErrorHandling(404, "Visa not found"));
     res.status(200).json(visa);
 });
 
 const updateVisa = catchAsyncError(async (req, res, next) => {
     const visa = await Visa.findById(req.params.id);
-    if (!visa) return next(new ErrorHandling(400, "Visa not found"));
+    if (!visa) return next(new ErrorHandling(404, "Visa not found"));
 
     // Update images if provided in base64
     if (req.body.visaImage) {

@@ -6,7 +6,7 @@ const visaAppliedSchema = new Schema({
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
     createdBy: { type: Date, default: Date.now }, 
     departureDate: { type: String, required: true }, 
-    numberOfTravellers: { type: Number, required: true }, 
+    numTravellers: { type: Number, required: true }, 
     visaDetails: [{
         passportId: { type: Schema.Types.ObjectId, ref: 'Passport', required: true }, 
         photoId: { type: Schema.Types.ObjectId, ref: 'Passport', required: true },  
@@ -26,7 +26,8 @@ const visaAppliedSchema = new Schema({
         gst: { type: String, required: true }, 
         visaFuCharge: { type: String, required: true }, 
         totalAddOnsCharge: { type: String, required: true }, 
-        grandTotal: { type: String, required: true } 
+        grandTotal: { type: String, required: true },
+        discount: { type: String, required: true } 
     },
     paymentStatus: { 
         type: String, 

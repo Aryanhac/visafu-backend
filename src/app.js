@@ -28,12 +28,14 @@ const visa = require('../src/Router/Visa');
 const visaApplied = require('../src/Router/VisaApplied');
 const addOns = require('../src/Router/AddOns');
 const testimonial = require('../src/Router/Testimonial');
+const verify = require('../src/Router/Verify');
 
 app.use('/api',user);
 app.use('/api',visa);
 app.use('/api',visaApplied);
 app.use('/api', addOns);
 app.use('/api',testimonial);
+app.use('/api',verify);
 
 //Error middleware
 app.use(errorMiddleware);

@@ -3,8 +3,8 @@ const { createAddOn, getAllAddOns, getAddOnById, updateAddOn, deleteAddOn } = re
 const app = express.Router();
 
 
-app.post('/addons', createAddOn); 
-app.get('/addons', getAllAddOns); 
+app.post('/createAddOns', createAddOn); 
+app.get('/getAddOns', getAllAddOns); 
 app.get('/addons/:id', getAddOnById); 
 app.put('/addons/:id', updateAddOn); 
 app.delete('/addons/:id', deleteAddOn); 
