@@ -3,12 +3,12 @@ const catchAsyncError = require("./catchAsyncError");
 const jwt=require('jsonwebtoken');
 const User=require('../src/Model/User');
 const isAuthentication=catchAsyncError(async(req,res,next)=>{
-    const {token}=req.cookies;
-    if(!token){
+    const {visaFuToken}=req.cookies;
+    if(!visaFuToken){
         return next(new ErrorHandling(401,"You have not logged In"));
     }
     
-    const decodeToken=jwt.verify(token,process.env.JWT_SECRET_ID);
+    const decodeToken=jwt.verify(visaFuToken,process.env.JWT_SECRET_ID);
     req.user=await User.findById(decodeToken.id);
     next();
 

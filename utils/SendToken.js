@@ -4,10 +4,11 @@ const sendToken=(user,res,statusCode)=>{
         httpOnly:true
     }
     //save in cookie
-    res.status(statusCode).cookie("token",token,options).json({
+    res.status(statusCode).cookie("visaFuToken",token,options).json({
         success:true,
         user,
-        token
+        token, 
+        message: "Successfully Login"
     })
 }
 module.exports=sendToken;

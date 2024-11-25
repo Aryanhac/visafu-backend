@@ -14,8 +14,9 @@ if(process.env.NODE_ENV!=='Production'){
 
 //middleware
 app.use(cors({
-    origin: '*',
-    credentials: true }));
+    origin: 'http://localhost:3000', // Replace with your frontend's URL
+    credentials: true, // Allow cookies to be sent
+}));
     
 app.use(fileupload());
 app.use(express.json({limit:"1000kb"}));

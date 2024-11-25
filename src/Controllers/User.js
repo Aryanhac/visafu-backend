@@ -44,6 +44,7 @@ const sendOtp = catchAsyncError(async (req, res, next) => {
         }
     };
 
+    console.log(params)
 
     const command = new PublishCommand(params);
 
