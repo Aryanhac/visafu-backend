@@ -76,42 +76,56 @@ const getVisaById = catchAsyncError(async (req, res, next) => {
 });
 
 const updateVisa = catchAsyncError(async (req, res, next) => {
-    const visa = await Visa.findById(req.params.id);
-    if (!visa) return next(new ErrorHandling(404, "Visa not found"));
+    const visaId = req.params.id;
 
-    // Update images if provided in base64
-    if (req.body.visaImage) {
-        const visaImageBuffer = base64ToBuffer(req.body.visaImage);
-        visa.visaImage = await uploadFiletoS3(visaImageBuffer);
-    }
-    if (req.body.cardImage) {
-        const cardImageBuffer = base64ToBuffer(req.body.cardImage);
-        visa.cardImage = await uploadFiletoS3(cardImageBuffer);
-    }
+        // Find visa by ID
+        const visa = await Visa.findById(visaId);
+        if (!visa) {
+            return next(new ErrorHandling(404, "Visa not found"));
+        }
 
-    // Handle review images
-    const reviews = req.body.reviews || [];
-    const reviewImages = await Promise.all(
-        reviews.map(async (review) => {
-            if (review.image) {
-                const imageBuffer = base64ToBuffer(review.image);
-                return await uploadFiletoS3(imageBuffer);
-            }
-            return null; // Default to null if no image
-        })
-    );
+        // Update visa image if provided
+        if (req.body.visaImage) {
+            const visaImageBuffer = base64ToBuffer(req.body.visaImage);
+            visa.visaImage = await uploadFiletoS3({...visaImageBuffer, name: "visaImage"});
+        }
 
-    // Update review images and other details
-    visa.reviews = reviews.map((review, index) => ({
-        ...review,
-        image: reviewImages[index]
-    }));
+        // Update card image if provided
+        if (req.body.cardImage) {
+            const cardImageBuffer = base64ToBuffer(req.body.cardImage);
+            visa.cardImage = await uploadFiletoS3({...cardImageBuffer, name: "cardImage"});
+        }
 
-    // Update other fields
-    Object.assign(visa, req.body);
+        // Handle reviews and their images
+        if (req.body.reviews) {
+            const updatedReviews = await Promise.all(
+                req.body.reviews.map(async (review) => {
+                    let updatedReview = { ...review };
 
-    const updatedVisa = await visa.save();
-    res.status(200).json(updatedVisa);
+                    // Upload review image if provided
+                    if (review.image) {
+                        const imageBuffer = base64ToBuffer(review.image);
+                        updatedReview.image = await uploadFiletoS3(imageBuffer);
+                    }
+
+                    return updatedReview;
+                })
+            );
+            visa.reviews = updatedReviews;
+        }
+
+        // Update other fields dynamically
+        const allowedUpdates = Object.keys(req.body).filter(
+            (key) => !["visaImage", "cardImage", "reviews"].includes(key)
+        );
+
+        allowedUpdates.forEach((key) => {
+            visa[key] = req.body[key];
+        });
+
+        // Save updated visa and return response
+        const updatedVisa = await visa.save();
+        res.status(200).json(updatedVisa);
 });
 
 const deleteVisa = catchAsyncError(async (req, res, next) => {
