@@ -51,7 +51,7 @@ const updateTestimonial = catchAsyncError(async (req, res, next) => {
 
     if (image) {
         const buffer = base64ToBuffer(image);
-        const imageUrl = await uploadFiletoS3(...buffer);
+        const imageUrl = await uploadFiletoS3({...buffer, name:"testimonial"});
         updatedData.imageUrl = imageUrl;
     }
 
