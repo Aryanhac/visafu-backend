@@ -1,6 +1,7 @@
 const express = require('express');
 const { createAddOn, getAllAddOns, getAddOnById, updateAddOn, deleteAddOn } = require('../Controllers/AddOns');
 const app = express.Router();
+const {isAuthentication,isAuthorizeRole}=require('../../middleware/authentication');
 
 
 app.post('/createAddOns', isAuthentication,isAuthorizeRole("admin"), createAddOn); 
