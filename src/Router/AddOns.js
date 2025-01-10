@@ -3,10 +3,10 @@ const { createAddOn, getAllAddOns, getAddOnById, updateAddOn, deleteAddOn } = re
 const app = express.Router();
 
 
-app.post('/createAddOns', createAddOn); 
+app.post('/createAddOns', isAuthentication,isAuthorizeRole("admin"), createAddOn); 
 app.get('/getAddOns', getAllAddOns); 
 app.get('/addons/:id', getAddOnById); 
-app.put('/addons/:id', updateAddOn); 
-app.delete('/addons/:id', deleteAddOn); 
+app.put('/addons/:id',isAuthentication,isAuthorizeRole("admin"), updateAddOn); 
+app.delete('/addons/:id',isAuthentication,isAuthorizeRole("admin"), deleteAddOn); 
 
 module.exports = app;
