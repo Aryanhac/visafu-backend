@@ -115,7 +115,7 @@ const generateOrderId = () => {
 
 Cashfree.XClientId = process.env.CASHFREE_CLIENT_ID;
 Cashfree.XClientSecret = process.env.CASHFREE_CLIENT_SECRET;
-Cashfree.XEnvironment = Cashfree.Environment.SANDBOX; // write PRODUCTION for live environment instead of SANDBOX
+Cashfree.XEnvironment = Cashfree.Environment.PRODUCTION; // write PRODUCTION for live environment instead of SANDBOX
 
 const cashfreePayment = catchAsyncError(async (req, res, next) => {
   try {
