@@ -19,7 +19,7 @@ process.on('uncaughtException',(err)=>{
     })
 })
 
-const server=https.createServer(app);
+const server = https.createServer(options, app);
 
 //connecting to database
 const con=database();
