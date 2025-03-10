@@ -1,6 +1,13 @@
-const http=require('http');
+const https=require('https');
+const fs = require('fs'); // For reading certificate and key files
 const app=require('./src/app');
 const database=require('./config/database');
+
+// Paths to your SSL certificate and private key
+const options = {
+    key: fs.readFileSync('/etc/letsencrypt/live/api.visafu.com/privkey.pem'),
+   cert: fs.readFileSync('/etc/letsencrypt/live/api.visafu.com/fullchain.pem')
+};
 
 
 //uncaughtException Error
@@ -12,7 +19,7 @@ process.on('uncaughtException',(err)=>{
     })
 })
 
-const server=http.createServer(app);
+const server=https.createServer(app);
 
 //connecting to database
 const con=database();
